@@ -2,46 +2,51 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 public class MyBST<K extends Comparable<K>,V> {
-
-
     Node rootNode;
-
     //true if this symbol table is empty; false otherwise
     public boolean isEmpty() {
         if (rootNode == null) {
-            return false;
-        } else {
             return true;
+        } else {
+            return false;
         }
     }
-
     //Returns th     e number of key-value pairs in this symbol table.
-    public int size(Node right) {
-        if (rootNode == null) {
+    public int size (){
+       return  size(rootNode);
+    }
+    public int size(Node node) {
+        if (node == null) {
             return 0;
         }
-        return size(rootNode.getLeft()) + 1 + size(rootNode.getRight());
+        return size(node.getLeft()) + 1 + size(node.getRight());
     }
 
+
     //true if this symbol table contains key and false otherwise
-    public boolean containsKey(Node rootNode, K key) {
-        if (rootNode == null) {
+    public boolean containsKey( K key){
+        return  containsKey(rootNode, key);
+    }
+    public boolean containsKey(Node node, K key) {
+        if (node == null) {
             return false;
         }
-        if (key.equals(rootNode.getKey())) {
+        if (key.equals(node.getKey())) {
             return true;
         }
-        int comparedKey = key.compareTo((K) rootNode.getKey());
+        int comparedKey = key.compareTo( (K)node.getKey());
         if (comparedKey < 0) {
-            return containsKey(rootNode.getLeft(), key);
+            return containsKey(node.getLeft(), key);
         } else if (comparedKey > 0) {
-            return containsKey(rootNode.getRight(), key);
+            return containsKey(node.getRight(), key);
         } else {
             return true;
         }
     }
-
     //true if this symbol table contains value and false otherwise
+    public boolean containsValue ( V value){
+        return  containsValue(rootNode, value);
+    }
     public boolean containsValue(Node rootNode, V value) {
         if (rootNode == null) {
             return false;
@@ -49,17 +54,13 @@ public class MyBST<K extends Comparable<K>,V> {
         if (value.equals(rootNode.getValue())) {
             return true;
         }
-        int comparedKey = ((Comparable<V>) value).compareTo((V) rootNode.getValue());
-        if (comparedKey < 0) {
-            return containsValue(rootNode.getLeft(), value);
-        } else if (comparedKey > 0) {
-            return containsValue(rootNode.getRight(), value);
-        } else {
-            return false;
-        }
+        return containsValue(rootNode.getLeft(), value) || containsValue(rootNode.getRight(), value);
     }
 
     //the value associated with the given key if the key is in the symbol table and null if the key is not in the symbol table
+  public V get (K key ){
+        return get( rootNode, key);
+  }
     public V get(Node rootNode, K key) {
         if (key == null || rootNode == null) {
             return null;
@@ -74,51 +75,58 @@ public class MyBST<K extends Comparable<K>,V> {
             return (V) rootNode.getValue();
         }
     }
-
     //Inserts the specified key-value pair into the symbol table, overwriting the old value with the new value if the symbol table already contains the specified key. Deletes the specified key (and its associated value) from this symbol table if the specified value is null.
-    public Node put(Node rootNode, K key, V val) {
-        if (rootNode == null) {
+  public Node put(K key , V val){
+        rootNode = put(rootNode, key, val);
+        return rootNode;
+  }
+    private Node put(Node node, K key, V val) {
+        if (node == null) {
             return new Node(key, val);
         }
-        int comparedKey = key.compareTo((K) rootNode.getKey());
+        int comparedKey = key.compareTo((K) node.getKey());
         if (comparedKey < 0) {
-            rootNode.setLeft(put(rootNode.getLeft(), key, val));
+            node.setLeft(put(node.getLeft(),key, val));
         } else if (comparedKey > 0) {
-            rootNode.setRight(put(rootNode.getRight(), key, val));
+            node.setRight(put(node.getRight(),key, val));
         } else {
-            rootNode.setValue(val);
+            node.setValue(val);
         }
-        return rootNode;
+        return node;
     }
 
     //Removes the smallest key and associated value from the symbol table.
-    public Node deleteMin(Node rootNode) {
-        if (rootNode != null) {
-            if (rootNode.getLeft() != null) {
-                rootNode.setLeft(deleteMin(rootNode.getLeft()));
-            } else {
-                delete(rootNode.getLeft(), (K) rootNode.getKey());
-            }
-        }
+    public Node deleteMin ( ){
+        rootNode=  deleteMin(rootNode);
         return rootNode;
     }
-
+    public Node deleteMin(Node rootNode) {
+        if (rootNode.getLeft()==null) {
+            return rootNode.getRight();
+            }
+        rootNode.setLeft(deleteMin(rootNode.getLeft()));
+        return rootNode;
+        }
 
     //Removes the largest key and associated value from the symbol table.
-    public Node deleteMax(Node rootNode) {
-        if (rootNode != null) {
-            if (rootNode.getRight() != null) {
-                rootNode.setRight(deleteMax(rootNode.getRight()));
-            } else {
-                delete(rootNode.getLeft(), (K) rootNode.getKey());
-            }
+public Node deleteMax(){
+        rootNode = deleteMax(rootNode);
+        return   rootNode;
+}
+private Node deleteMax(Node rootNode) {
+        if (rootNode.getRight() == null) {
+             return rootNode.getLeft();
         }
+        rootNode.setRight(deleteMax(rootNode.getRight()));
         return rootNode;
     }
 
-
     //Removes the specified key and its associated value from this symbol table (if the key is in this symbol table).
-    public Object delete(Node rootNode, K key) {
+  public Node delete ( K key){
+        rootNode = delete(rootNode, key);
+        return rootNode ;
+  }
+    public Node delete(Node rootNode, K key) {
         if (rootNode == null) {
             return null;
         }
@@ -136,39 +144,38 @@ public class MyBST<K extends Comparable<K>,V> {
                 return rootNode.getRight();
             } else {
                 // two child
-                Node newReplacement = findMin(rootNode.getRight());
+                Node newReplacement = findMin2(rootNode.getRight());
                 rootNode.setKey(newReplacement.getKey());
                 rootNode.setValue(newReplacement.getValue());
-                rootNode.setRight(deleteMin2(newReplacement.getRight()));
+                rootNode.setRight(deleteMin2(rootNode.getRight()));
             }
         }
         return rootNode;
     }
-
-    // create helper method to find minimum key in subtree
-    // create helper method to delete min value within subtree
-    private Node deleteMin2(Node rootNode) {
-        if (rootNode.getLeft() == null) {
-            return rootNode.getRight();
-        }
-        rootNode.setLeft(deleteMin2(rootNode.getLeft()));
-        return rootNode;
+    public  Node deleteMin2 (Node rootNode ){
+    if ( rootNode.getLeft() == null ){
+    return null;
     }
-
-    private Node findMin(Node rootNode) {
+     while ( rootNode.getRight() != null ){
+    rootNode = rootNode.getRight();
+     }
+      return rootNode;
+    }
+    public Node findMin2 ( Node rootNode){
         if (rootNode == null) {
+
             return null;
         }
-        while (rootNode.getLeft() != null) {
-            rootNode = rootNode.getLeft();
+        while ( rootNode.getLeft()!= null){
+          rootNode = rootNode.getLeft();
         }
-        return rootNode;
+        return  rootNode;
     }
-
-    //
+    // create helper method to find minimum key in subtree
+    // create helper method to delete min value within subtree
     //the smallest key in the symbol table
     public K min() {
-        Node minNode = findMin(rootNode);
+        Node minNode = findMin2(rootNode);
         if (rootNode != null) {
             return (K) minNode.getKey();
         } else {
@@ -187,9 +194,23 @@ public class MyBST<K extends Comparable<K>,V> {
         }
         return (K) maxNode.getKey();
     }
+    private Node findMax( Node rootNode){
+        if  ( rootNode == null){
+            return null;
+        }
+        while ( rootNode.getRight()!=null){
+            rootNode= rootNode.getRight();
+
+        }
+        return  rootNode;
+
+    }
 
     //Returns the height of the BST
-    public int height() {
+    public int height(){
+        return height(rootNode);
+    }
+    public int height(Node rootNode) {
         int leftCount = 0;
         int rightCount = 0;
         Node leftSide = rootNode;
